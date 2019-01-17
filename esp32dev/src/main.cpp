@@ -16,10 +16,10 @@
 #define HIDREMO_WS_ENDPOINT_PORT = 80
 #define HIDREMO_WS_ENDPOINT_PATH = "/ws"
 
-static bool bleConnected = false;
-
 #define HIDREMO_REPORTID_KEYBOARD 1
 #define HIDREMO_REPORTID_CONSUMER 2
+
+static bool bleConnected = false;
 
 static BLECharacteristic* inputKeyboard;
 static BLECharacteristic* inputConsumer;
