@@ -19,10 +19,45 @@ void delayTask(TickType_t ms)
     vTaskDelay(ms / portTICK_PERIOD_MS);
 }
 
+void taskWifi(void* pvParameters)
+{
+    while (1)
+    {
+        if (WiFi.status() != WL_CONNECTED)
+        {
+            WiFi.mode(WIFI_STA);
+            WiFi.disconnect();
+            WiFi.begin(HIDREMO_WIFI_SSID, HIDREMO_WIFI_PASSPHRASE, NULL, NULL, true);
+            while (WiFi.status() != WL_CONNECTED)
+            {
+                Serial.println(WiFi.status());
+                delayTask(1000);
+            }
+            Serial.println("Wi-Fi: connected.");
+        }
+        delayTask(1000);
+    }
+}
+
+void startWifiTask()
+{
+    xTaskCreatePinnedToCore(
+        taskWifi,
+        "TaskWifi",
+        1024 * 2.5,
+        NULL,
+        100,
+        NULL,
+        0
+    );
+}
+
 void setup()
 {
     Serial.begin(115200);
     while (!Serial) { delayTask(10); }
+
+    startWifiTask();
 }
 
 void loop()
