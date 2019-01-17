@@ -166,6 +166,39 @@ void setup()
     startBleServer();
 }
 
+void typeKeyCode(
+    unsigned char usage,
+    unsigned char modifier,
+    unsigned char keyCode
+) {
+    if (!bleConnected) {
+        Serial.printf("%s is not connected. ignore.", HIDREMO_DEVICE_NAME);
+        Serial.println();
+        return;
+    }
+
+    BLECharacteristic* in;
+
+    if (usage == 7) {
+        Serial.println("Usage 0x07: Keyboard.");
+        in = inputKeyboard;
+    } else if (usage == 192) {
+        Serial.println("Usage 0x0c: Consumer.");
+        in = inputConsumer;
+    } else {
+        Serial.println("Err: received usage is not supported.");
+        return;
+    }
+
+    uint8_t a[] = {modifier, 0x0, keyCode, 0x0, 0x0, 0x0, 0x0, 0x0};
+    in->setValue(a, sizeof(a));
+    in->notify();
+
+    uint8_t v[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
+    in->setValue(v, sizeof(v));
+    in->notify();
+}
+
 void handleReceivedPayload(char* payload) {
     Serial.printf("WS: recv `%s`.", payload);
     Serial.println();
@@ -194,7 +227,7 @@ void handleReceivedPayload(char* payload) {
     Serial.printf("Received keycode: %hhu (usage: %hhu).", keyCode, usage);
     Serial.println();
 
-    // TODO
+    typeKeyCode(usage, 0, keyCode);
 }
 
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
