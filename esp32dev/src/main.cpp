@@ -6,15 +6,18 @@
 
 #include "BLEHIDDevice.h"
 
+#include <WebSocketsClient.h>
+#include <ArduinoJson.h>
+
 #define HIDREMO_DEVICE_NAME "MyBLEDevice"
 #define HIDREMO_MANUFACTURER "Shuma Yoshioka"
 
 #define HIDREMO_WIFI_SSID "dummy"
 #define HIDREMO_WIFI_PASSPHRASE "dummy"
 
-#define HIDREMO_WS_ENDPOINT_HOST = "example.com"
-#define HIDREMO_WS_ENDPOINT_PORT = 80
-#define HIDREMO_WS_ENDPOINT_PATH = "/ws"
+#define HIDREMO_WS_ENDPOINT_HOST "example.com"
+#define HIDREMO_WS_ENDPOINT_PORT 80
+#define HIDREMO_WS_ENDPOINT_PATH "/ws"
 
 #define HIDREMO_REPORTID_KEYBOARD 1
 #define HIDREMO_REPORTID_CONSUMER 2
@@ -68,6 +71,8 @@ static bool bleConnected = false;
 
 static BLECharacteristic* inputKeyboard;
 static BLECharacteristic* inputConsumer;
+
+static xTaskHandle taskWebSocketHandle = NULL;
 
 void delayTask(TickType_t ms)
 {
@@ -161,7 +166,73 @@ void setup()
     startBleServer();
 }
 
+void handleReceivedPayload(char* payload) {
+    Serial.printf("WS: recv `%s`.", payload);
+    Serial.println();
+
+    // TODO
+}
+
+void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
+    switch (type) {
+        case WStype_DISCONNECTED:
+            Serial.println("WS: disconnected.");
+            haltWebSocketTask();
+            break;
+        case WStype_CONNECTED:
+            Serial.println("WS: connected.");
+            break;
+        case WStype_TEXT:
+            handleReceivedPayload((char*) payload);
+            break;
+        default:
+            Serial.println("WS: unsupported type detected.");
+    }
+}
+
+void haltWebSocketTask() {
+    xTaskHandle handle = taskWebSocketHandle;
+    taskWebSocketHandle = NULL;
+    vTaskDelete(handle);
+}
+
+void taskWebSocket(void* pvParameters) {
+    bool wifiConnected = WiFi.status() = WL_CONNECTED;
+
+    if (!wifiConnected) {
+        return;
+    }
+
+    WebSocketsClient ws;
+
+    ws.begin(HIDREMO_WS_ENDPOINT_HOST, HIDREMO_WS_ENDPOINT_PORT, HIDREMO_WS_ENDPOINT_PATH);
+    ws.onEvent(webSocketEvent);
+    ws.setReconnectInterval(1000 * 2);
+
+    while (wifiConnected) {
+        ws.loop();
+        delayTask(1000);
+    }
+
+    haltWebSocketTask();
+}
+
+void createWebSocketTask() {
+    xTaskCreatePinnedToCore(
+        taskWebSocket,
+        "TaskWebSocket",
+        1024 * 4,
+        NULL,
+        100,
+        &taskWebSocketHandle,
+        0
+    );
+}
+
 void loop()
 {
-
+    if (taskWebSocketHandle == NULL) {
+        createWebSocketTask();
+    }
+    delayTask(1000 * 2);
 }
