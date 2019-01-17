@@ -19,6 +19,51 @@
 #define HIDREMO_REPORTID_KEYBOARD 1
 #define HIDREMO_REPORTID_CONSUMER 2
 
+static const uint8_t HIDREMO_REPORT_MAP[] = {
+    USAGE_PAGE(1), 0x01,
+    USAGE(1), 0x06,
+        COLLECTION(1), 0x01,
+            // modifiers
+            REPORT_ID(1), HIDREMO_REPORTID_KEYBOARD,
+            USAGE_PAGE(1), 0x07,
+            USAGE_MINIMUM(1), 0xe0,
+            USAGE_MAXIMUM(1), 0xe7,
+            LOGICAL_MINIMUM(1), 0x00,
+            LOGICAL_MAXIMUM(1), 0x01,
+            REPORT_COUNT(1), 0x08,
+            REPORT_SIZE(1), 0x01,
+            // reserved
+            HIDINPUT(1), 0x02,
+            REPORT_COUNT(1), 0x01,
+            REPORT_SIZE(1), 0x08,
+            HIDINPUT(1), 0x01,
+            // keys
+            REPORT_COUNT(1), 0x06,
+            REPORT_SIZE(1), 0x08,
+            LOGICAL_MINIMUM(1), 0x00,
+            LOGICAL_MAXIMUM(1), 0xff,
+            USAGE_PAGE(1), 0x07,
+            USAGE_MINIMUM(1), 0x00,
+            USAGE_MAXIMUM(1), 0xff,
+            HIDINPUT(1), 0x00,
+        END_COLLECTION(0),
+    USAGE_PAGE(1), 0x0c,
+    USAGE(1), 0x01,
+        COLLECTION(1), 0x01,
+            REPORT_ID(1), HIDREMO_REPORTID_CONSUMER,
+            USAGE_PAGE(1), 0x0c,
+            REPORT_COUNT(1), 0x06,
+            REPORT_SIZE(1), 0x08,
+            LOGICAL_MINIMUM(1), 0x00,
+            LOGICAL_MAXIMUM(1), 0x01,
+            USAGE_PAGE(1), 0x0c,
+            USAGE_MINIMUM(1), 0x00,
+            USAGE_MAXIMUM(1), 0xff,
+            HIDINPUT(1), 0x00,
+            HIDINPUT(1), 0x00, //padding
+        END_COLLECTION(0)
+};
+
 static bool bleConnected = false;
 
 static BLECharacteristic* inputKeyboard;
