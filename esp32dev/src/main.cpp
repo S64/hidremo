@@ -7,12 +7,22 @@
 #include "BLEHIDDevice.h"
 
 #define HIDREMO_DEVICE_NAME "MyBLEDevice"
+#define HIDREMO_MANUFACTURER "Shuma Yoshioka"
+
 #define HIDREMO_WIFI_SSID "dummy"
 #define HIDREMO_WIFI_PASSPHRASE "dummy"
 
 #define HIDREMO_WS_ENDPOINT_HOST = "example.com"
 #define HIDREMO_WS_ENDPOINT_PORT = 80
 #define HIDREMO_WS_ENDPOINT_PATH = "/ws"
+
+static bool bleConnected = false;
+
+#define HIDREMO_REPORTID_KEYBOARD 1
+#define HIDREMO_REPORTID_CONSUMER 2
+
+static BLECharacteristic* inputKeyboard;
+static BLECharacteristic* inputConsumer;
 
 void delayTask(TickType_t ms)
 {
@@ -52,12 +62,58 @@ void startWifiTask()
     );
 }
 
+class MyBleCallbacks : public BLEServerCallbacks
+{
+
+    void onConnect(BLEServer* svr)
+    {
+        bleConnected = true;
+        Serial.println("BLE: connected.");
+    }
+
+    void onDisconnect(BLEServer* svr)
+    {
+        bleConnected = false;
+        Serial.println("BLE: disconnected.");
+    }
+
+};
+
+void startBleServer()
+{
+    BLEDevice::init(HIDREMO_DEVICE_NAME);
+    BLEServer* svr = BLEDevice::createServer();
+    svr->setCallbacks(new MyBleCallbacks());
+
+    BLEHIDDevice* hid = new BLEHIDDevice(svr);
+
+    inputKeyboard = hid->inputReport(HIDREMO_REPORTID_KEYBOARD);
+    inputConsumer = hid->inputReport(HIDREMO_REPORTID_CONSUMER);
+
+    hid->manufacturer()->setValue(HIDREMO_MANUFACTURER);
+    hid->pnp(0x02, 0xe502, 0xa111, 0x0210);
+    hid->hidInfo(0x00, 0x01);
+    hid->reportMap((uint8_t*) HIDREMO_REPORT_MAP, sizeof(HIDREMO_REPORT_MAP));
+    hid->startServices();
+
+    BLESecurity *sec = new BLESecurity();
+    sec->setAuthenticationMode(ESP_LE_AUTH_BOND);
+
+    BLEAdvertising* adv = svr->getAdvertising();
+    adv->setAppearance(ESP_BLE_APPEARANCE_HID_KEYBOARD);
+    adv->addServiceUUID(hid->hidService()->getUUID());
+    adv->start();
+
+    Serial.println("BLE: start advertising.");
+}
+
 void setup()
 {
     Serial.begin(115200);
     while (!Serial) { delayTask(10); }
 
     startWifiTask();
+    startBleServer();
 }
 
 void loop()
