@@ -170,6 +170,30 @@ void handleReceivedPayload(char* payload) {
     Serial.printf("WS: recv `%s`.", payload);
     Serial.println();
 
+    DynamicJsonBuffer jb;
+    JsonObject& obj = jb.parseObject(payload);
+
+    if (!obj.success()) {
+        Serial.println("WS: parse failed.");
+        return;
+    }
+
+    if (strcmp(obj["event"], "KeyEvent") != 0) {
+        Serial.println("WS: received event has not supported.");
+        return;
+    }
+
+    if (obj["usage"] == NULL) {
+        Serial.println("WS: usage code was empty.");
+        return;
+    }
+
+    unsigned char keyCode = obj["keyCode"];
+    unsigned char usage = obj["usage"];
+
+    Serial.printf("Received keycode: %hhu (usage: %hhu).", keyCode, usage);
+    Serial.println();
+
     // TODO
 }
 
