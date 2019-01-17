@@ -22,6 +22,7 @@ void delayTask(TickType_t ms)
 void setup()
 {
     Serial.begin(115200);
+    while (!Serial) { delayTask(10); }
 }
 
 void loop()
