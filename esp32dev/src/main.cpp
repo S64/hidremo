@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <BLEDevice.h>
+#include <freertos/task.h>
 
 #include "BLEHIDDevice.h"
 
@@ -12,6 +13,11 @@
 #define HIDREMO_WS_ENDPOINT_HOST = "example.com"
 #define HIDREMO_WS_ENDPOINT_PORT = 80
 #define HIDREMO_WS_ENDPOINT_PATH = "/ws"
+
+void delayTask(TickType_t ms)
+{
+    vTaskDelay(ms / portTICK_PERIOD_MS);
+}
 
 void setup()
 {
