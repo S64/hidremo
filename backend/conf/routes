@@ -2,5 +2,6 @@ GET     /ws             controllers.MyController.ws
 POST    /togglePower    controllers.MyController.togglePower
 POST    /launchTv       controllers.MyController.launchTv
 POST    /sleep          controllers.MyController.sleep
+POST    /volumeUp       controllers.MyController.volumeUp
 POST    /volumeDown     controllers.MyController.volumeDown
 POST    /numOne         controllers.MyController.numOne
