@@ -58,7 +58,7 @@ static const uint8_t HIDREMO_REPORT_MAP[] = {
             REPORT_COUNT(1), 0x06,
             REPORT_SIZE(1), 0x08,
             LOGICAL_MINIMUM(1), 0x00,
-            LOGICAL_MAXIMUM(1), 0x01,
+            LOGICAL_MAXIMUM(1), 0xff,
             USAGE_PAGE(1), 0x0c,
             USAGE_MINIMUM(1), 0x00,
             USAGE_MAXIMUM(1), 0xff,
