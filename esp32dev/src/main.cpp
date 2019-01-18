@@ -254,7 +254,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
 }
 
 void taskWebSocket(void* pvParameters) {
-    bool wifiConnected = WiFi.status() = WL_CONNECTED;
+    bool wifiConnected = WiFi.status() == WL_CONNECTED;
 
     if (!wifiConnected) {
         return;
