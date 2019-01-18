@@ -72,6 +72,8 @@ static bool bleConnected = false;
 static BLECharacteristic* inputKeyboard;
 static BLECharacteristic* inputConsumer;
 
+static WebSocketsClient ws;
+
 static xTaskHandle taskWebSocketHandle = NULL;
 
 void delayTask(TickType_t ms)
@@ -81,10 +83,12 @@ void delayTask(TickType_t ms)
 
 void taskWifi(void* pvParameters)
 {
+    Serial.println("Wi-Fi: task created.");
     while (1)
     {
         if (WiFi.status() != WL_CONNECTED)
         {
+            Serial.println("Wi-Fi: connecting...");
             WiFi.mode(WIFI_STA);
             WiFi.disconnect();
             WiFi.begin(HIDREMO_WIFI_SSID, HIDREMO_WIFI_PASSPHRASE, NULL, NULL, true);
@@ -95,7 +99,7 @@ void taskWifi(void* pvParameters)
             }
             Serial.println("Wi-Fi: connected.");
         }
-        delayTask(1000);
+        delayTask(1000 * 10);
     }
 }
 
@@ -162,8 +166,14 @@ void setup()
     Serial.begin(115200);
     while (!Serial) { delayTask(10); }
 
-    startWifiTask();
     startBleServer();
+
+    while (!bleConnected) {
+        Serial.println("Waiting BLE connection...");
+        delayTask(1000 * 5);
+    }
+
+    startWifiTask();
 }
 
 void typeKeyCode(
@@ -231,8 +241,16 @@ void handleReceivedPayload(char* payload) {
 }
 
 void haltWebSocketTask() {
+    if (taskWebSocketHandle == NULL) {
+        Serial.println("WS: task was already halted.");
+        return;
+    }
+
     xTaskHandle handle = taskWebSocketHandle;
     taskWebSocketHandle = NULL;
+
+    ws.disconnect();
+
     vTaskDelete(handle);
 }
 
@@ -256,20 +274,24 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
 void taskWebSocket(void* pvParameters) {
     bool wifiConnected = WiFi.status() == WL_CONNECTED;
 
-    if (!wifiConnected) {
+    if (!wifiConnected || !bleConnected) {
+        Serial.println("WS: Wi-Fi or BLE not conntected.");
+        haltWebSocketTask();
         return;
     }
 
-    WebSocketsClient ws;
+    Serial.println("WS: connecting...");
 
     ws.begin(HIDREMO_WS_ENDPOINT_HOST, HIDREMO_WS_ENDPOINT_PORT, HIDREMO_WS_ENDPOINT_PATH);
     ws.onEvent(webSocketEvent);
     ws.setReconnectInterval(1000 * 2);
 
-    while (wifiConnected) {
+    while (wifiConnected && bleConnected) {
         ws.loop();
         delayTask(1000);
     }
+
+    Serial.println("WS: Wi-Fi or BLE disconnected. Halt websocket task.");
 
     haltWebSocketTask();
 }
@@ -291,5 +313,6 @@ void loop()
     if (taskWebSocketHandle == NULL) {
         createWebSocketTask();
     }
-    delayTask(1000 * 2);
+
+    delayTask(1000 * 10);
 }
