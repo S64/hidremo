@@ -5,3 +5,4 @@ POST    /sleep          controllers.MyController.sleep
 POST    /volumeUp       controllers.MyController.volumeUp
 POST    /volumeDown     controllers.MyController.volumeDown
 POST    /numOne         controllers.MyController.numOne
+POST    /numFour        controllers.MyController.numFour
