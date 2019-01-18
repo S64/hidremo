@@ -26,4 +26,9 @@ class MyController @Inject()(
     Ok("Request was sent.")
   }
 
+  def sleep = Action { req =>
+    keyEventService.sendKeyEvent(192, 50)
+    Ok("Request was sent.")
+  }
+
 }
