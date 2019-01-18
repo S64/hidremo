@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub, Sink, Source}
 import com.google.inject.ImplementedBy
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
 
 @ImplementedBy(classOf[MyKeyEventServiceImpl])
@@ -17,6 +17,7 @@ trait MyKeyEventService {
 
 }
 
+@Singleton
 class MyKeyEventServiceImpl @Inject()(
   implicit mat: Materializer
 ) extends MyKeyEventService {
