@@ -31,4 +31,9 @@ class MyController @Inject()(
     Ok("Request was sent.")
   }
 
+  def volumeDown = Action { req =>
+    keyEventService.sendKeyEvent(192, 234)
+    Ok("Request was sent.")
+  }
+
 }
