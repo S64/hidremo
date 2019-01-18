@@ -1,4 +1,4 @@
-package entities.Entities
+package entities
 
 import play.api.libs.json.{JsValue, Json}
 

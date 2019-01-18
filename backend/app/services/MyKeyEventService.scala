@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub, Sink, Source}
 import com.google.inject.ImplementedBy
-import entities.Entities.HidremoKeyEvent
+import entities.HidremoKeyEvent
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
 
