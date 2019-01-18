@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{BroadcastHub, Keep, MergeHub, Sink, Source}
 import com.google.inject.ImplementedBy
+import entities.Entities.HidremoKeyEvent
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
 
@@ -28,6 +29,14 @@ class MyKeyEventServiceImpl @Inject()(
       .run()
   }
 
-  override def sendKeyEvent(usage: Int, keyCode: Int): Unit = ???
+  override def sendKeyEvent(usage: Int, keyCode: Int) = {
+    Source.single(
+      HidremoKeyEvent(
+        event = "KeyEvent",
+        usage = usage,
+        keyCode = keyCode,
+      ).as[JsValue]
+    ).runWith(mySink)
+  }
 
 }
