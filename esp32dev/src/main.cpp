@@ -230,6 +230,12 @@ void handleReceivedPayload(char* payload) {
     typeKeyCode(usage, 0, keyCode);
 }
 
+void haltWebSocketTask() {
+    xTaskHandle handle = taskWebSocketHandle;
+    taskWebSocketHandle = NULL;
+    vTaskDelete(handle);
+}
+
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
     switch (type) {
         case WStype_DISCONNECTED:
@@ -245,12 +251,6 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
         default:
             Serial.println("WS: unsupported type detected.");
     }
-}
-
-void haltWebSocketTask() {
-    xTaskHandle handle = taskWebSocketHandle;
-    taskWebSocketHandle = NULL;
-    vTaskDelete(handle);
 }
 
 void taskWebSocket(void* pvParameters) {
