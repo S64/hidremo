@@ -6,6 +6,18 @@ sealed trait HidremoEvent {
   def event: String
 }
 
+case class HidremoKeyEvent(
+  event: String,
+  usage: Int,
+  keyCode: Int
+) extends HidremoEvent
+
+object HidremoKeyEvent {
+
+  implicit val format = Json.format[HidremoKeyEvent]
+
+}
+
 object HidremoEvent {
 
   implicit def json2object(value: JsValue): HidremoEvent = {
@@ -19,17 +31,5 @@ object HidremoEvent {
       case event: HidremoKeyEvent => Json.toJson(event)
     }
   }
-
-}
-
-case class HidremoKeyEvent(
-  event: String,
-  usage: Int,
-  keyCode: Int
-) extends HidremoEvent
-
-object HidremoKeyEvent {
-
-  implicit val format = Json.format[HidremoKeyEvent]
 
 }
