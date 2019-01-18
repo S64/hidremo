@@ -1,1 +1,2 @@
-GET    /ws    controllers.MyController.ws
+GET     /ws             controllers.MyController.ws
+POST    /togglePower    controllers.MyController.togglePower

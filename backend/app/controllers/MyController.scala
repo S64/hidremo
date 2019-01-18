@@ -16,4 +16,9 @@ class MyController @Inject()(
     Flow.fromSinkAndSource(Sink.ignore, keyEventService.mySource);
   }
 
+  def togglePower = Action { req =>
+    keyEventService.sendKeyEvent(7, 102)
+    Ok("Request was sent.")
+  }
+
 }
