@@ -36,4 +36,9 @@ class MyController @Inject()(
     Ok("Request was sent.")
   }
 
+  def numOne = Action { req =>
+    keyEventService.sendKeyEvent(7, 30)
+    Ok("Request was sent.")
+  }
+
 }

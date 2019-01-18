@@ -3,3 +3,4 @@ POST    /togglePower    controllers.MyController.togglePower
 POST    /launchTv       controllers.MyController.launchTv
 POST    /sleep          controllers.MyController.sleep
 POST    /volumeDown     controllers.MyController.volumeDown
+POST    /numOne         controllers.MyController.numOne
