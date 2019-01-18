@@ -21,4 +21,9 @@ class MyController @Inject()(
     Ok("Request was sent.")
   }
 
+  def launchTv = Action { req =>
+    keyEventService.sendKeyEvent(192, 137)
+    Ok("Request was sent.")
+  }
+
 }

@@ -1,2 +1,3 @@
 GET     /ws             controllers.MyController.ws
 POST    /togglePower    controllers.MyController.togglePower
+POST    /launchTv       controllers.MyController.launchTv
