@@ -9,11 +9,15 @@ sealed trait HidremoEvent {
 object HidremoEvent {
 
   implicit def json2object(value: JsValue): HidremoEvent = {
-    ???
+    (value \ "event").as[String] match {
+      case "KeyEvent" => value.as[HidremoKeyEvent]
+    }
   }
 
   implicit def object2json(event: HidremoEvent): JsValue = {
-    ???
+    event match {
+      case event: HidremoKeyEvent => Json.toJson(event)
+    }
   }
 
 }
