@@ -46,8 +46,38 @@ class MyController @Inject()(
     Ok("Request was sent.")
   }
 
+  def numTwo = Action { req =>
+    keyEventService.sendKeyEvent(7, 31)
+    Ok("Request was sent.")
+  }
+
   def numFour = Action { req =>
     keyEventService.sendKeyEvent(7, 33)
+    Ok("Request was sent.")
+  }
+
+  def numFive = Action { req =>
+    keyEventService.sendKeyEvent(7, 34)
+    Ok("Request was sent.")
+  }
+
+  def numSix = Action { req =>
+    keyEventService.sendKeyEvent(7, 35)
+    Ok("Request was sent.")
+  }
+
+  def numSeven = Action { req =>
+    keyEventService.sendKeyEvent(7, 36)
+    Ok("Request was sent.")
+  }
+
+  def numEight = Action { req =>
+    keyEventService.sendKeyEvent(7, 37)
+    Ok("Request was sent.")
+  }
+
+  def numNine = Action { req =>
+    keyEventService.sendKeyEvent(7, 38)
     Ok("Request was sent.")
   }
 
